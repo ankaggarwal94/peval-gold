@@ -21,8 +21,9 @@ import json
 import math
 import re
 from collections import defaultdict
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any
 
 import numpy as np
 
@@ -127,16 +128,16 @@ class RaschLite:
             global_n += 1
 
         if global_n == 0:
-            raise ValueError(
-                "RaschLite.fit requires at least one row with response in {0.0, 1.0}"
-            )
+            raise ValueError("RaschLite.fit requires at least one row with response in {0.0, 1.0}")
 
         self._n_fit_rows = global_n
         self._global_p = _smoothed_rate(global_k, global_n, 0.5, 2.0)
         self._global_logit = float(safe_logit(self._global_p, eps=self.eps))
 
         self._subject_theta = {
-            key: float(safe_logit(_smoothed_rate(k, n, self._global_p, self.subject_kappa), eps=self.eps))
+            key: float(
+                safe_logit(_smoothed_rate(k, n, self._global_p, self.subject_kappa), eps=self.eps)
+            )
             for key, (k, n) in subject_counts.items()
         }
         self._benchmark_beta = {
@@ -144,8 +145,7 @@ class RaschLite:
             for key, (k, n) in benchmark_counts.items()
         }
         self._item_beta = {
-            key: self._difficulty_beta(k, n, self.item_kappa)
-            for key, (k, n) in item_counts.items()
+            key: self._difficulty_beta(k, n, self.item_kappa) for key, (k, n) in item_counts.items()
         }
         self._text_weights, self._n_text_items = self._fit_text_regressor(
             item_beta=self._item_beta,
@@ -186,7 +186,7 @@ class RaschLite:
         Path(path).write_text(json.dumps(payload, separators=(",", ":")))
 
     @classmethod
-    def load(cls, path: str | Path) -> "RaschLite":
+    def load(cls, path: str | Path) -> RaschLite:
         """Restore a JSON artifact written by :meth:`save`."""
         payload = json.loads(Path(path).read_text())
         model = cls(**payload["config"])
@@ -196,9 +196,7 @@ class RaschLite:
         model._subject_theta = {
             str(k): float(v) for k, v in payload.get("subject_theta", {}).items()
         }
-        model._item_beta = {
-            str(k): float(v) for k, v in payload.get("item_beta", {}).items()
-        }
+        model._item_beta = {str(k): float(v) for k, v in payload.get("item_beta", {}).items()}
         model._benchmark_beta = {
             str(k): float(v) for k, v in payload.get("benchmark_beta", {}).items()
         }

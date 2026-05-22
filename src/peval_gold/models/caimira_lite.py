@@ -79,9 +79,7 @@ class CaimiraLiteModel(nn.Module):
         self.benchmark_bias: nn.Embedding | None
         self.condition_bias: nn.Embedding | None
 
-        self.subject_bias = (
-            nn.Embedding(config.n_subjects, 1) if config.use_subject_bias else None
-        )
+        self.subject_bias = nn.Embedding(config.n_subjects, 1) if config.use_subject_bias else None
         self.benchmark_bias = (
             nn.Embedding(config.n_benchmarks, 1) if config.use_benchmark_bias else None
         )
@@ -222,9 +220,7 @@ class CaimiraLiteModel(nn.Module):
         ``copy_`` so ``state_dict`` ownership and device placement survive.
         """
         if all_item_embs.ndim != 2:
-            raise ValueError(
-                "all_item_embs must have shape (n_items, item_embed_dim)"
-            )
+            raise ValueError("all_item_embs must have shape (n_items, item_embed_dim)")
         raw = self.difficulty(all_item_embs.float())
         self.diff_mean.copy_(raw.mean(dim=0))
 

@@ -286,10 +286,7 @@ def domain_holdout(
 
     train_domains = _flatten_domains(train)
     val_domains = _flatten_domains(val)
-    overlap_ok = (
-        not has_domain_anywhere
-        or train_domains.isdisjoint(val_domains)
-    )
+    overlap_ok = not has_domain_anywhere or train_domains.isdisjoint(val_domains)
 
     manifest: dict[str, Any] = {
         "split_kind": "domain_holdout",

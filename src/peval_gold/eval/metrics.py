@@ -73,9 +73,7 @@ def clip_probability(p: ArrayLike, eps: float = 1e-4) -> np.ndarray | float:
     hide the bug. See
     (project pattern doc).
     """
-    is_scalar = isinstance(p, (int, float)) or (
-        isinstance(p, np.ndarray) and p.ndim == 0
-    )
+    is_scalar = isinstance(p, (int, float)) or (isinstance(p, np.ndarray) and p.ndim == 0)
     arr = np.asarray(p, dtype=float)
     nan_mask = np.isnan(arr)
     clipped = np.clip(arr, eps, 1.0 - eps)
@@ -98,9 +96,7 @@ def sigmoid(z: ArrayLike) -> np.ndarray | float:
 
     Preserves scalar-ness exactly like :func:`clip_probability`.
     """
-    is_scalar = isinstance(z, (int, float)) or (
-        isinstance(z, np.ndarray) and z.ndim == 0
-    )
+    is_scalar = isinstance(z, (int, float)) or (isinstance(z, np.ndarray) and z.ndim == 0)
     z_arr = np.asarray(z, dtype=float)
     pos = z_arr >= 0
     out = np.empty_like(z_arr)
@@ -119,9 +115,7 @@ def safe_logit(p: ArrayLike, eps: float = 1e-4) -> np.ndarray | float:
     ``sigmoid(safe_logit(p)) == clip_probability(p)`` holds to numpy's
     float64 precision (~1e-12 in practice; tested to 1e-9).
     """
-    is_scalar = isinstance(p, (int, float)) or (
-        isinstance(p, np.ndarray) and p.ndim == 0
-    )
+    is_scalar = isinstance(p, (int, float)) or (isinstance(p, np.ndarray) and p.ndim == 0)
     clipped = np.asarray(clip_probability(p, eps=eps), dtype=float)
     out = np.log(clipped / (1.0 - clipped))
     if is_scalar:

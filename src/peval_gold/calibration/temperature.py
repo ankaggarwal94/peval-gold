@@ -114,9 +114,7 @@ class TemperatureCalibrator:
         y = np.asarray(y_true, dtype=float)
         p = np.asarray(p_pred_or_logits, dtype=float)
         if y.shape != p.shape:
-            raise ValueError(
-                f"y_true shape {y.shape} != p_pred_or_logits shape {p.shape}"
-            )
+            raise ValueError(f"y_true shape {y.shape} != p_pred_or_logits shape {p.shape}")
         if _identity_fallback_required(y):
             self.temperature = 1.0
             self.converged = True
@@ -177,7 +175,7 @@ class TemperatureCalibrator:
         Path(path).write_text(json.dumps(payload, sort_keys=True))
 
     @classmethod
-    def load(cls, path: str) -> "TemperatureCalibrator":
+    def load(cls, path: str) -> TemperatureCalibrator:
         payload = json.loads(Path(path).read_text())
         cal = cls(
             l2=float(payload.get("l2", 0.1)),

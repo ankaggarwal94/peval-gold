@@ -67,7 +67,17 @@ def parse_subject_display_name(name: str) -> dict[str, Any]:
     m = re.search(r"(?<!\d)(\d+(?:\.\d+)?)\s*b\b", text)
     if m:
         size_billions = float(m.group(1))
-        size_bucket = "tiny" if size_billions < 3 else "small" if size_billions < 10 else "medium" if size_billions < 35 else "large" if size_billions < 100 else "xlarge"
+        size_bucket = (
+            "tiny"
+            if size_billions < 3
+            else "small"
+            if size_billions < 10
+            else "medium"
+            if size_billions < 35
+            else "large"
+            if size_billions < 100
+            else "xlarge"
+        )
         confidence = max(confidence, 0.85)
     elif any(tok in text for tok in ["mini", "haiku", "small", "nano"]):
         size_bucket = "small"

@@ -91,7 +91,12 @@ select = [
 ]
 ignore = [
     "E501",  # line too long (ruff format handles this)
+    "F841",  # unused variable — common in tests that bind intermediates for readability
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# Conditional / deferred imports inside try-except guards trigger E402.
+"tests/test_calibration.py" = ["E402"]
 
 [tool.ruff.format]
 quote-style = "double"

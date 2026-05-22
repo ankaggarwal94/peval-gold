@@ -167,9 +167,7 @@ def test_eb_predict_proba_matches_eb_formula_for_known_subject_cell() -> None:
 
     info = eb.get_cell_info("subject", "A")
     assert info is not None, "subject A should be in the fitted hierarchy"
-    expected = (info["k"] + info["kappa"] * info["parent_p"]) / (
-        info["n"] + info["kappa"]
-    )
+    expected = (info["k"] + info["kappa"] * info["parent_p"]) / (info["n"] + info["kappa"])
 
     # Use unknown benchmark + unknown condition so the lookup chain falls
     # PAST subject_benchmark_condition / subject_benchmark / benchmark and
@@ -201,9 +199,9 @@ def test_eb_unknown_subject_falls_back_to_benchmark_level() -> None:
 
     bench_info = eb.get_cell_info("benchmark", "X")
     assert bench_info is not None
-    expected = (
-        bench_info["k"] + bench_info["kappa"] * bench_info["parent_p"]
-    ) / (bench_info["n"] + bench_info["kappa"])
+    expected = (bench_info["k"] + bench_info["kappa"] * bench_info["parent_p"]) / (
+        bench_info["n"] + bench_info["kappa"]
+    )
 
     pred = eb.predict_proba(
         [
@@ -328,8 +326,7 @@ def test_eb_kappa_clipped_to_range_when_siblings_have_identical_rates() -> None:
     kappa_subject = eb.get_level_kappa("subject")
     assert 1.0 <= kappa_subject <= 1000.0
     assert kappa_subject == pytest.approx(1000.0, abs=1e-9), (
-        f"identical sibling rates should saturate kappa to 1000.0 cap; "
-        f"got {kappa_subject}"
+        f"identical sibling rates should saturate kappa to 1000.0 cap; got {kappa_subject}"
     )
 
 
@@ -350,8 +347,7 @@ def test_eb_kappa_clipped_below_when_siblings_have_extreme_variance() -> None:
     kappa_subject = eb.get_level_kappa("subject")
     assert 1.0 <= kappa_subject <= 1000.0
     assert kappa_subject == pytest.approx(1.0, abs=1e-9), (
-        f"extreme sibling variance should saturate kappa to 1.0 floor; "
-        f"got {kappa_subject}"
+        f"extreme sibling variance should saturate kappa to 1.0 floor; got {kappa_subject}"
     )
 
 

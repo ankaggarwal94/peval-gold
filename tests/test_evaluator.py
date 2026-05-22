@@ -19,12 +19,10 @@ so the suite stays sub-second.
 from __future__ import annotations
 
 import json
-import math
 from pathlib import Path
 
 import numpy as np
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # Tiny synthetic shim predictors
@@ -117,7 +115,12 @@ def test_evaluate_returns_required_report_schema() -> None:
         assert isinstance(metrics[key], float) or metrics[key] is None
 
     timing = report["timing"]
-    for key in ("predict_one_p50_ms", "predict_one_p95_ms", "predict_one_max_ms", "n_predict_calls"):
+    for key in (
+        "predict_one_p50_ms",
+        "predict_one_p95_ms",
+        "predict_one_max_ms",
+        "n_predict_calls",
+    ):
         assert key in timing
     assert timing["n_predict_calls"] == 12
 
@@ -151,9 +154,7 @@ def test_evaluate_metrics_match_metric_module() -> None:
     assert report["metrics"]["mean_log_likelihood"] == pytest.approx(
         mean_log_likelihood(y, p), abs=1e-9
     )
-    assert report["metrics"]["brier_score"] == pytest.approx(
-        brier_score(y, p), abs=1e-9
-    )
+    assert report["metrics"]["brier_score"] == pytest.approx(brier_score(y, p), abs=1e-9)
 
 
 def test_evaluate_auc_is_one_for_perfectly_ranking_predictor() -> None:
@@ -378,9 +379,7 @@ def test_append_result_is_append_only(tmp_path: Path) -> None:
     from peval_gold.experiments import ledger
 
     run_id = "test-run-append"
-    ledger.write_manifest(
-        run_id, config={}, files=[], metadata={}, root=tmp_path
-    )
+    ledger.write_manifest(run_id, config={}, files=[], metadata={}, root=tmp_path)
 
     ledger.append_result(run_id, {"k": 1}, root=tmp_path)
     ledger.append_result(run_id, {"k": 2}, root=tmp_path)

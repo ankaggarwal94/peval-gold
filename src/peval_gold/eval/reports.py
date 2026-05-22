@@ -18,7 +18,8 @@ from __future__ import annotations
 
 import json
 import math
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 
 def to_json(report: Mapping[str, Any], path: str) -> str:
@@ -32,6 +33,7 @@ def _json_safe(obj: Any) -> Any:
     """Coerce numpy scalars / sets / paths to JSON-friendly types."""
     try:
         import numpy as _np
+
         if isinstance(obj, _np.generic):
             return obj.item()
     except Exception:
@@ -82,9 +84,7 @@ def to_markdown(report: Mapping[str, Any], path: str) -> str:
     lines.append(f"- Predictor class: `{pred_cls}`")
     lines.append(f"- Examples scored: **{n}**")
     if report.get("n_skipped_non_binary") is not None:
-        lines.append(
-            f"- Non-binary rows skipped: {report['n_skipped_non_binary']}"
-        )
+        lines.append(f"- Non-binary rows skipped: {report['n_skipped_non_binary']}")
     if "n_rounds" in report:
         lines.append(f"- Adaptive rounds: {report['n_rounds']}")
     lines.append(f"- Timestamp (UTC): `{ts}`")
@@ -99,21 +99,14 @@ def to_markdown(report: Mapping[str, Any], path: str) -> str:
         f"`{_fmt(metrics.get('mean_log_likelihood'))}` |"
     )
     lines.append(
-        f"| Ordinary log loss (nll, lower better) | "
-        f"`{_fmt(metrics.get('ordinary_log_loss'))}` |"
+        f"| Ordinary log loss (nll, lower better) | `{_fmt(metrics.get('ordinary_log_loss'))}` |"
     )
-    lines.append(
-        f"| Brier score (lower better) | "
-        f"`{_fmt(metrics.get('brier_score'))}` |"
-    )
+    lines.append(f"| Brier score (lower better) | `{_fmt(metrics.get('brier_score'))}` |")
     lines.append(
         f"| Expected calibration error (lower better) | "
         f"`{_fmt(metrics.get('expected_calibration_error'))}` |"
     )
-    lines.append(
-        f"| ROC AUC (higher better) | "
-        f"`{_fmt(metrics.get('auc'))}` |"
-    )
+    lines.append(f"| ROC AUC (higher better) | `{_fmt(metrics.get('auc'))}` |")
     lines.append("")
 
     lines.append("## Per-benchmark")

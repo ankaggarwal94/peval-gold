@@ -120,9 +120,7 @@ def fit_blend_weights(
     if n_predictors == 0:
         raise ValueError("fit_blend_weights requires at least one predictor column")
     if y.shape != (n_samples,):
-        raise ValueError(
-            f"y shape {y.shape} does not match p_matrix rows {n_samples}"
-        )
+        raise ValueError(f"y shape {y.shape} does not match p_matrix rows {n_samples}")
     if n_samples == 0:
         raise ValueError("fit_blend_weights requires at least one sample")
 
@@ -168,9 +166,7 @@ def fit_blend_weights(
     return weights
 
 
-def ensemble_calibration_check(
-    p_blend: np.ndarray, y: np.ndarray
-) -> dict[str, float]:
+def ensemble_calibration_check(p_blend: np.ndarray, y: np.ndarray) -> dict[str, float]:
     """Return ``{ece, slope, intercept}`` for an already-blended prediction.
 
     ``slope`` and ``intercept`` come from a 1-D Platt-style fit:
@@ -184,9 +180,7 @@ def ensemble_calibration_check(
     p_blend = np.asarray(p_blend, dtype=float)
     y = np.asarray(y, dtype=float)
     if p_blend.shape != y.shape:
-        raise ValueError(
-            f"shape mismatch: p_blend {p_blend.shape} vs y {y.shape}"
-        )
+        raise ValueError(f"shape mismatch: p_blend {p_blend.shape} vs y {y.shape}")
     n = p_blend.size
     if n == 0:
         return {"ece": 0.0, "slope": 1.0, "intercept": 0.0}
@@ -194,9 +188,7 @@ def ensemble_calibration_check(
     # Reuse fit_blend_weights with a single-predictor column (p_blend) to
     # get (intercept, slope) for free. Use a tiny l2 so this is
     # essentially unregularized Platt.
-    weights = fit_blend_weights(
-        p_blend.reshape(-1, 1), y, l2=1e-6
-    )
+    weights = fit_blend_weights(p_blend.reshape(-1, 1), y, l2=1e-6)
     intercept = float(weights[0])
     slope = float(weights[1])
 
@@ -246,9 +238,7 @@ class LogitBlend:
 
     def __init__(self, constituents: Sequence[tuple[Any, str]]) -> None:
         if not constituents:
-            raise ValueError(
-                "LogitBlend requires at least one constituent predictor"
-            )
+            raise ValueError("LogitBlend requires at least one constituent predictor")
         self._constituents: list[tuple[Any, str]] = list(constituents)
         # Default weights: intercept=0, equal-and-positive per-predictor
         # weights summing to 1. This makes the predict_one identity hold
@@ -299,9 +289,7 @@ class LogitBlend:
             binary_rows.append(r)
 
         if not binary_rows:
-            raise ValueError(
-                "LogitBlend.fit: 0 usable training rows after binary filtering"
-            )
+            raise ValueError("LogitBlend.fit: 0 usable training rows after binary filtering")
 
         p_matrix = self._collect_constituent_predictions(binary_rows)
         y = np.asarray(y_vals, dtype=float)
@@ -354,7 +342,7 @@ class LogitBlend:
         cls,
         path: str | Path,
         constituents: Sequence[tuple[Any, str]] | None = None,
-    ) -> "LogitBlend":
+    ) -> LogitBlend:
         """Restore a LogitBlend.
 
         Because constituents are not serialized (see :meth:`save`), the
@@ -371,8 +359,7 @@ class LogitBlend:
         names_passed = [n for _, n in constituents]
         if names_on_disk != names_passed:
             raise ValueError(
-                f"constituent name mismatch: saved {names_on_disk!r} "
-                f"vs passed {names_passed!r}"
+                f"constituent name mismatch: saved {names_on_disk!r} vs passed {names_passed!r}"
             )
         obj = cls(constituents)
         obj._weights = np.asarray(payload["weights"], dtype=float)
@@ -389,9 +376,7 @@ class LogitBlend:
         weights = np.asarray(weights, dtype=float)
         expected = len(self._constituents) + 1
         if weights.shape != (expected,):
-            raise ValueError(
-                f"weights must be shape ({expected},); got {weights.shape}"
-            )
+            raise ValueError(f"weights must be shape ({expected},); got {weights.shape}")
         if not np.all(np.isfinite(weights)):
             raise ValueError("weights contain non-finite values")
         self._weights = weights
@@ -418,9 +403,7 @@ class LogitBlend:
 
     # ----- Internals ---------------------------------------------------
 
-    def _collect_constituent_predictions(
-        self, rows: Sequence[Mapping[str, Any]]
-    ) -> np.ndarray:
+    def _collect_constituent_predictions(self, rows: Sequence[Mapping[str, Any]]) -> np.ndarray:
         """Run each constituent's batched ``predict_proba`` over ``rows``.
 
         Returns a ``(N, n_predictors)`` numpy array suitable for
@@ -433,8 +416,7 @@ class LogitBlend:
             preds = np.asarray(pred.predict_proba(rows), dtype=float)
             if preds.shape != (n,):
                 raise ValueError(
-                    f"constituent #{i} predict_proba returned shape "
-                    f"{preds.shape}; expected ({n},)"
+                    f"constituent #{i} predict_proba returned shape {preds.shape}; expected ({n},)"
                 )
             out[:, i] = preds
         return out

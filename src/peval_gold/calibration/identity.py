@@ -55,7 +55,7 @@ class IdentityCalibrator:
         Path(path).write_text(json.dumps(payload, sort_keys=True))
 
     @classmethod
-    def load(cls, path: str) -> "IdentityCalibrator":
+    def load(cls, path: str) -> IdentityCalibrator:
         """Reconstruct from a payload written by :meth:`save`."""
         payload = json.loads(Path(path).read_text())
         return cls(eps=float(payload.get("eps", _CLIP_EPS)))

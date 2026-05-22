@@ -95,12 +95,7 @@ def test_canonical_item_prepends_benchmark_and_condition(basic_row: dict) -> Non
 
     out = canonical_item(basic_row)
     assert isinstance(out, str)
-    expected = (
-        "Benchmark: mmlupro\n"
-        "Condition: cot\n"
-        "Item:\n"
-        "What is 2+2? (A) 3 (B) 4 (C) 5 (D) 6"
-    )
+    expected = "Benchmark: mmlupro\nCondition: cot\nItem:\nWhat is 2+2? (A) 3 (B) 4 (C) 5 (D) 6"
     assert out == expected
 
 
@@ -243,9 +238,7 @@ def test_templates_source_is_pure_python_no_torch_no_numpy() -> None:
     templates module to live on the no-network / lightweight side of the
     runtime contract.
     """
-    src = (
-        REPO_ROOT / "src" / "peval_gold" / "data" / "templates.py"
-    ).read_text()
+    src = (REPO_ROOT / "src" / "peval_gold" / "data" / "templates.py").read_text()
     for forbidden in (
         "import torch",
         "import numpy",

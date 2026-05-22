@@ -70,11 +70,11 @@ import hashlib
 import importlib.util
 import json
 import os
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 import numpy as np
-
 
 DEFAULT_ENCODER_REPO = "sentence-transformers/all-mpnet-base-v2"
 
@@ -109,8 +109,7 @@ def _load_ncf_head_class(ncf_head_path: Path) -> type:
     )
     if spec is None or spec.loader is None:
         raise ImportError(
-            f"could not build spec for {ncf_head_path}; "
-            "Python import machinery returned None"
+            f"could not build spec for {ncf_head_path}; Python import machinery returned None"
         )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -346,7 +345,7 @@ class CurrentNCF:
         Path(path).write_text(json.dumps(payload, indent=2, sort_keys=True))
 
     @classmethod
-    def load(cls, path: str | os.PathLike[str]) -> "CurrentNCF":
+    def load(cls, path: str | os.PathLike[str]) -> CurrentNCF:
         """Reconstruct a wrapper from a pointer JSON written by :meth:`save`."""
         payload = json.loads(Path(path).read_text())
         return cls(
@@ -421,12 +420,8 @@ class CurrentNCF:
     def _ncf_logit(self, input_dict: dict) -> Any:
         """One (subject, item) pair through encoder + NCF head → scalar logit."""
         torch = self._torch
-        u = self._encode_one(
-            input_dict.get("subject_content", ""), self._subject_cache
-        )
-        v = self._encode_one(
-            input_dict.get("item_content", ""), self._item_cache
-        )
+        u = self._encode_one(input_dict.get("subject_content", ""), self._subject_cache)
+        v = self._encode_one(input_dict.get("item_content", ""), self._item_cache)
         with torch.no_grad():
             x = torch.cat([u, v], dim=-1).to(self._device)
             return self._head(x)
@@ -463,9 +458,7 @@ class CurrentNCF:
 
             a = torch.tensor(1.0, requires_grad=True)
             b = torch.tensor(0.0, requires_grad=True)
-            opt = torch.optim.LBFGS(
-                [a, b], lr=1.0, max_iter=50, line_search_fn="strong_wolfe"
-            )
+            opt = torch.optim.LBFGS([a, b], lr=1.0, max_iter=50, line_search_fn="strong_wolfe")
 
             def closure():  # type: ignore[no-untyped-def]
                 opt.zero_grad()

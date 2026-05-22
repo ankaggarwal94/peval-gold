@@ -16,7 +16,6 @@ import pytest
 
 from peval_gold.eval.transfer_audit import AuditResult, audit_candidate
 
-
 # ---------------------------------------------------------------------------
 # Synthetic-fixture helpers
 # ---------------------------------------------------------------------------

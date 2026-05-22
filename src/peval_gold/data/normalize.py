@@ -66,7 +66,8 @@ from __future__ import annotations
 
 import hashlib
 import math
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 import numpy as np
 
@@ -234,12 +235,8 @@ def coerce_response_to_float(value: Any) -> float:
         try:
             return float(value)
         except ValueError as exc:
-            raise ValueError(
-                f"response value {value!r} is not a numeric string"
-            ) from exc
-    raise ValueError(
-        f"response value {value!r} of type {type(value).__name__} is not numeric"
-    )
+            raise ValueError(f"response value {value!r} is not a numeric string") from exc
+    raise ValueError(f"response value {value!r} of type {type(value).__name__} is not numeric")
 
 
 # ---------------------------------------------------------------------------
@@ -255,9 +252,7 @@ def _first(raw: Mapping[str, Any], keys: tuple[str, ...], default: Any) -> Any:
     return default
 
 
-def _first_str(
-    raw: Mapping[str, Any], keys: tuple[str, ...], default: str
-) -> str:
+def _first_str(raw: Mapping[str, Any], keys: tuple[str, ...], default: str) -> str:
     val = _first(raw, keys, default=default)
     if val is None:
         return default

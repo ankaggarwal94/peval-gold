@@ -111,8 +111,7 @@ def test_policy_module_does_not_import_heavy_ml_stack(module_path: str) -> None:
     post = _heavy_in_sys_modules_now()
     newly_imported = post - pre
     assert newly_imported == set(), (
-        f"{module_path} pulled in heavy ML modules at import time: "
-        f"{sorted(newly_imported)}"
+        f"{module_path} pulled in heavy ML modules at import time: {sorted(newly_imported)}"
     )
 
 
@@ -155,7 +154,11 @@ def test_uncertainty_proxy_docstring_marks_it_runtime_unsafe() -> None:
         ("peval_gold.acquisition.simhash_reservoir", "SimHashReservoir", {}),
         ("peval_gold.acquisition.simhash_reservoir", "SimHashReservoir", {"reservoir_size": 64}),
         ("peval_gold.acquisition.stratified", "StratifiedBonus", {}),
-        ("peval_gold.acquisition.stratified", "StratifiedBonus", {"stratifier": "benchmark_condition"}),
+        (
+            "peval_gold.acquisition.stratified",
+            "StratifiedBonus",
+            {"stratifier": "benchmark_condition"},
+        ),
         ("peval_gold.acquisition.uncertainty", "UncertaintyProxy", {}),
     ],
 )
@@ -321,25 +324,31 @@ def test_stratified_bonus_rewards_underrepresented_categories() -> None:
 
     # Saturate bench_A
     for i in range(10):
-        pol.score_one({
+        pol.score_one(
+            {
+                "benchmark": "bench_A",
+                "condition": "none",
+                "subject_content": f"Name: m-{i}",
+                "item_content": f"item-{i}",
+            }
+        )
+
+    saturated = pol.score_one(
+        {
             "benchmark": "bench_A",
             "condition": "none",
-            "subject_content": f"Name: m-{i}",
-            "item_content": f"item-{i}",
-        })
-
-    saturated = pol.score_one({
-        "benchmark": "bench_A",
-        "condition": "none",
-        "subject_content": "Name: m-X",
-        "item_content": "item-saturated",
-    })
-    fresh = pol.score_one({
-        "benchmark": "bench_B",
-        "condition": "none",
-        "subject_content": "Name: m-X",
-        "item_content": "item-fresh",
-    })
+            "subject_content": "Name: m-X",
+            "item_content": "item-saturated",
+        }
+    )
+    fresh = pol.score_one(
+        {
+            "benchmark": "bench_B",
+            "condition": "none",
+            "subject_content": "Name: m-X",
+            "item_content": "item-fresh",
+        }
+    )
 
     # The fresh stratum gets a meaningfully larger bonus contribution.
     # Lower bound on the gap: 0.5 * (1/(1+0) - 1/(1+11)) ~= 0.46.
@@ -362,25 +371,31 @@ def test_stratified_bonus_benchmark_condition_stratifier_uses_both() -> None:
 
     # Saturate (bench_A, none)
     for i in range(10):
-        pol.score_one({
+        pol.score_one(
+            {
+                "benchmark": "bench_A",
+                "condition": "none",
+                "subject_content": f"Name: m-{i}",
+                "item_content": f"item-{i}",
+            }
+        )
+
+    saturated = pol.score_one(
+        {
             "benchmark": "bench_A",
             "condition": "none",
-            "subject_content": f"Name: m-{i}",
-            "item_content": f"item-{i}",
-        })
-
-    saturated = pol.score_one({
-        "benchmark": "bench_A",
-        "condition": "none",
-        "subject_content": "Name: m-X",
-        "item_content": "item-sat",
-    })
-    fresh_condition = pol.score_one({
-        "benchmark": "bench_A",  # same benchmark
-        "condition": "cot",      # different condition
-        "subject_content": "Name: m-X",
-        "item_content": "item-fresh",
-    })
+            "subject_content": "Name: m-X",
+            "item_content": "item-sat",
+        }
+    )
+    fresh_condition = pol.score_one(
+        {
+            "benchmark": "bench_A",  # same benchmark
+            "condition": "cot",  # different condition
+            "subject_content": "Name: m-X",
+            "item_content": "item-fresh",
+        }
+    )
 
     # Different condition should still register as a fresh stratum.
     assert fresh_condition > saturated + 0.10
@@ -474,9 +489,7 @@ def test_run_adaptive_simulation_resets_policy_between_rounds() -> None:
     pol = _Counting()
     pred = _ConstantPredictor()
     rows = _synth_val_rows(40)
-    run_adaptive_simulation(
-        policy=pol, predictor=pred, val_rows=rows, k_per_category=5, n_rounds=3
-    )
+    run_adaptive_simulation(policy=pol, predictor=pred, val_rows=rows, k_per_category=5, n_rounds=3)
     assert pol.reset_calls == 3
     # 40 rows × 3 rounds = 120 score_one calls minimum.
     assert pol.score_calls == 120

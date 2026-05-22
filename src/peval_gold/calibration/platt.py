@@ -107,9 +107,7 @@ class PlattCalibrator:
         y = np.asarray(y_true, dtype=float)
         p = np.asarray(p_pred_or_logits, dtype=float)
         if y.shape != p.shape:
-            raise ValueError(
-                f"y_true shape {y.shape} != p_pred_or_logits shape {p.shape}"
-            )
+            raise ValueError(f"y_true shape {y.shape} != p_pred_or_logits shape {p.shape}")
         if _identity_fallback_required(y):
             self.a, self.b = 1.0, 0.0
             self.converged = True
@@ -144,9 +142,7 @@ class PlattCalibrator:
 
         def closure():
             opt.zero_grad()
-            loss = torch.nn.functional.binary_cross_entropy_with_logits(
-                a * logits_t + b, targets_t
-            )
+            loss = torch.nn.functional.binary_cross_entropy_with_logits(a * logits_t + b, targets_t)
             loss.backward()
             return loss
 
@@ -190,7 +186,7 @@ class PlattCalibrator:
         Path(path).write_text(json.dumps(payload, sort_keys=True))
 
     @classmethod
-    def load(cls, path: str) -> "PlattCalibrator":
+    def load(cls, path: str) -> PlattCalibrator:
         payload = json.loads(Path(path).read_text())
         cal = cls(
             eps=float(payload.get("eps", _CLIP_EPS)),
@@ -240,9 +236,7 @@ class RegularizedPlattCalibrator:
         y = np.asarray(y_true, dtype=float)
         p = np.asarray(p_pred_or_logits, dtype=float)
         if y.shape != p.shape:
-            raise ValueError(
-                f"y_true shape {y.shape} != p_pred_or_logits shape {p.shape}"
-            )
+            raise ValueError(f"y_true shape {y.shape} != p_pred_or_logits shape {p.shape}")
         if _identity_fallback_required(y):
             self.a, self.b = 1.0, 0.0
             self.converged = True
@@ -253,9 +247,7 @@ class RegularizedPlattCalibrator:
         except ImportError as exc:  # pragma: no cover - torch is project dep
             self.a, self.b = 1.0, 0.0
             self.converged = False
-            raise RuntimeError(
-                "RegularizedPlattCalibrator requires torch."
-            ) from exc
+            raise RuntimeError("RegularizedPlattCalibrator requires torch.") from exc
 
         logits = _safe_logit(p, eps=self.eps)
         logits_t = torch.tensor(logits, dtype=torch.float32)
@@ -273,10 +265,8 @@ class RegularizedPlattCalibrator:
 
         def closure():
             opt.zero_grad()
-            bce = torch.nn.functional.binary_cross_entropy_with_logits(
-                a * logits_t + b, targets_t
-            )
-            penalty = l2 * ((a - 1.0) ** 2 + b ** 2)
+            bce = torch.nn.functional.binary_cross_entropy_with_logits(a * logits_t + b, targets_t)
+            penalty = l2 * ((a - 1.0) ** 2 + b**2)
             loss = bce + penalty
             loss.backward()
             return loss
@@ -317,7 +307,7 @@ class RegularizedPlattCalibrator:
         Path(path).write_text(json.dumps(payload, sort_keys=True))
 
     @classmethod
-    def load(cls, path: str) -> "RegularizedPlattCalibrator":
+    def load(cls, path: str) -> RegularizedPlattCalibrator:
         payload = json.loads(Path(path).read_text())
         cal = cls(
             l2=float(payload.get("l2", 0.1)),

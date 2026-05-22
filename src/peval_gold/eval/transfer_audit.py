@@ -611,9 +611,7 @@ def audit_candidate(
             best_probe = min(probes_with_nll, key=probes_with_nll.get)
             best_probe_nll = probes_with_nll[best_probe]
     delta = (
-        (raw_nll - best_probe_nll)
-        if (raw_nll is not None and best_probe_nll is not None)
-        else None
+        (raw_nll - best_probe_nll) if (raw_nll is not None and best_probe_nll is not None) else None
     )
     sub_d_pass = delta is not None and delta < calibration_delta_threshold
     sub_d = {

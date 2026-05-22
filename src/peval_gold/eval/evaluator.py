@@ -41,7 +41,8 @@ import datetime as _dt
 import math
 import time
 from collections import defaultdict
-from typing import Any, Iterable, Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
+from typing import Any
 
 import numpy as np
 
@@ -51,7 +52,6 @@ from peval_gold.eval.metrics import (
     mean_log_likelihood,
     ordinary_log_loss,
 )
-
 
 _METRIC_KEYS_ALL_NONE = {
     "ordinary_log_loss": None,
@@ -129,9 +129,7 @@ def _safe_metric(fn, y: np.ndarray, p: np.ndarray) -> float | None:
     return float(fn(y, p))
 
 
-def _aggregate_metrics(
-    y: np.ndarray, p: np.ndarray, n_bins: int = 10
-) -> dict[str, float | None]:
+def _aggregate_metrics(y: np.ndarray, p: np.ndarray, n_bins: int = 10) -> dict[str, float | None]:
     """All five top-level metrics in one bundle."""
     if y.size == 0:
         return dict(_METRIC_KEYS_ALL_NONE)
@@ -139,9 +137,7 @@ def _aggregate_metrics(
         "ordinary_log_loss": _safe_metric(ordinary_log_loss, y, p),
         "mean_log_likelihood": _safe_metric(mean_log_likelihood, y, p),
         "brier_score": _safe_metric(brier_score, y, p),
-        "expected_calibration_error": float(
-            expected_calibration_error(y, p, n_bins=n_bins)
-        ),
+        "expected_calibration_error": float(expected_calibration_error(y, p, n_bins=n_bins)),
         "auc": _numpy_auc(y, p),
     }
 
@@ -405,12 +401,12 @@ def evaluate_adaptive(
         "n_examples": int(y_arr.size),
         "n_skipped_non_binary": int(total_skipped),
         "metrics": _aggregate_metrics(y_arr, p_arr, n_bins=ece_bins),
-        "per_benchmark": _grouped_summary(
-            lambda r: r.get("benchmark", ""), all_rows, y_arr, p_arr
-        ) if all_rows else {},
-        "per_condition": _grouped_summary(
-            lambda r: r.get("condition", ""), all_rows, y_arr, p_arr
-        ) if all_rows else {},
+        "per_benchmark": _grouped_summary(lambda r: r.get("benchmark", ""), all_rows, y_arr, p_arr)
+        if all_rows
+        else {},
+        "per_condition": _grouped_summary(lambda r: r.get("condition", ""), all_rows, y_arr, p_arr)
+        if all_rows
+        else {},
         "timing": {
             "predict_one_p50_ms": _percentile_ms(all_timings, 50.0),
             "predict_one_p95_ms": _percentile_ms(all_timings, 95.0),

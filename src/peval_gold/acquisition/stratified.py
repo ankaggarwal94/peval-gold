@@ -115,13 +115,11 @@ class StratifiedBonus:
     ) -> None:
         if stratifier not in _VALID_STRATIFIERS:
             raise ValueError(
-                f"stratifier must be one of {sorted(_VALID_STRATIFIERS)!r}, "
-                f"got {stratifier!r}"
+                f"stratifier must be one of {sorted(_VALID_STRATIFIERS)!r}, got {stratifier!r}"
             )
         if not math.isfinite(bonus_weight) or bonus_weight < 0:
             raise ValueError(
-                f"bonus_weight must be a non-negative finite float, "
-                f"got {bonus_weight!r}"
+                f"bonus_weight must be a non-negative finite float, got {bonus_weight!r}"
             )
         self._stratifier = stratifier
         self._bonus_weight = float(bonus_weight)
@@ -177,9 +175,7 @@ class StratifiedBonus:
     def _diversity_score(self, signature: int) -> float:
         if not self._reservoir:
             return 1.0
-        nearest = min(
-            (signature ^ old).bit_count() for old in self._reservoir
-        )
+        nearest = min((signature ^ old).bit_count() for old in self._reservoir)
         return nearest / float(_BITS)
 
     def _update_reservoir(self, signature: int, ex: dict) -> None:
@@ -189,10 +185,13 @@ class StratifiedBonus:
         if self._candidate_count == 0:
             return
         candidate_key = _visible_text(ex)
-        slot = _hash_u64(
-            f"{candidate_key}\n{self._candidate_count}",
-            person=b"reservoir-v1",
-        ) % self._candidate_count
+        slot = (
+            _hash_u64(
+                f"{candidate_key}\n{self._candidate_count}",
+                person=b"reservoir-v1",
+            )
+            % self._candidate_count
+        )
         if slot < self._reservoir_cap:
             self._reservoir[slot] = signature
 

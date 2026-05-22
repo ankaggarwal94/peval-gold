@@ -129,13 +129,9 @@ class SimHashReservoir:
 
     def __init__(self, reservoir_size: int = _DEFAULT_RESERVOIR, bits: int = _DEFAULT_BITS) -> None:
         if reservoir_size < 1:
-            raise ValueError(
-                f"reservoir_size must be >= 1, got {reservoir_size!r}"
-            )
+            raise ValueError(f"reservoir_size must be >= 1, got {reservoir_size!r}")
         if bits < 8 or bits % 8 != 0:
-            raise ValueError(
-                f"bits must be a positive multiple of 8, got {bits!r}"
-            )
+            raise ValueError(f"bits must be a positive multiple of 8, got {bits!r}")
         self._reservoir_size = int(reservoir_size)
         self._bits = int(bits)
         self._seen_signatures: list[int] = []
@@ -170,9 +166,7 @@ class SimHashReservoir:
     def _diversity_score(self, signature: int) -> float:
         if not self._seen_signatures:
             return 1.0
-        nearest = min(
-            (signature ^ old).bit_count() for old in self._seen_signatures
-        )
+        nearest = min((signature ^ old).bit_count() for old in self._seen_signatures)
         return nearest / float(self._bits)
 
     def _update_reservoir(self, signature: int, ex: dict) -> None:
@@ -193,10 +187,13 @@ class SimHashReservoir:
         if self._candidate_count == 0:  # defensive — should never hit
             return
         candidate_key = _visible_text(ex)
-        slot = _hash_u64(
-            f"{candidate_key}\n{self._candidate_count}",
-            person=b"reservoir-v1",
-        ) % self._candidate_count
+        slot = (
+            _hash_u64(
+                f"{candidate_key}\n{self._candidate_count}",
+                person=b"reservoir-v1",
+            )
+            % self._candidate_count
+        )
         if slot < self._reservoir_size:
             self._seen_signatures[slot] = signature
 

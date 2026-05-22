@@ -41,8 +41,8 @@ the NCF's encoder ever runs.
 Combined with ``peval_gold.models.ensemble.LogitBlend``, an EB-shaped
 prior is the standard "kaggle-grade" base for an item-side
 collaborative-filtering head — see
-(reference recommendation blueprint § Empirical
-Bayes and shrinkage``.
+a recommendation-blueprint § Empirical
+Bayes and shrinkage.
 
 Runtime characteristics
 -----------------------
@@ -190,9 +190,7 @@ class EBPriors:
         self._kappa_max = float(kappa_max)
         self._default_kappa = float(default_kappa)
         self._min_count_for_triple = int(min_count_for_triple)
-        self._levels: dict[str, dict[Any, dict[str, float]]] = {
-            lvl: {} for lvl in _ALL_LEVELS
-        }
+        self._levels: dict[str, dict[Any, dict[str, float]]] = {lvl: {} for lvl in _ALL_LEVELS}
         # Per-level kappa estimate (set during fit).
         self._kappa_by_level: dict[str, float] = {}
         # Marker for "have we fit yet"; predict_* will use 0.5 fallback
@@ -278,9 +276,7 @@ class EBPriors:
             n_seen += 1
 
         if n_seen == 0:
-            raise ValueError(
-                "EBPriors.fit found 0 usable rows (no row had response in {0.0, 1.0})"
-            )
+            raise ValueError("EBPriors.fit found 0 usable rows (no row had response in {0.0, 1.0})")
 
         # ----- 2. Compute global p_eb (Laplace prior over the entire dataset) -----
         gk, gn = counts["global"][None]
@@ -370,16 +366,14 @@ class EBPriors:
         Path(path).write_text(json.dumps(payload, separators=(",", ":")))
 
     @classmethod
-    def load(cls, path: str | Path) -> "EBPriors":
+    def load(cls, path: str | Path) -> EBPriors:
         """Restore an EBPriors instance from a JSON file written by :meth:`save`."""
         payload = json.loads(Path(path).read_text())
         eb = cls(
             kappa_min=payload.get("kappa_min", _KAPPA_MIN),
             kappa_max=payload.get("kappa_max", _KAPPA_MAX),
             default_kappa=payload.get("default_kappa", _DEFAULT_KAPPA),
-            min_count_for_triple=payload.get(
-                "min_count_for_triple", _MIN_COUNT_FOR_TRIPLE
-            ),
+            min_count_for_triple=payload.get("min_count_for_triple", _MIN_COUNT_FOR_TRIPLE),
         )
         eb._kappa_by_level = dict(payload.get("kappa_by_level", {}))
         for lvl, entries in payload.get("levels", {}).items():
@@ -397,9 +391,7 @@ class EBPriors:
 
     # ----- Introspection helpers (used by tests + walkthrough) ---------
 
-    def get_cell_info(
-        self, level: str, key: Any
-    ) -> dict[str, float] | None:
+    def get_cell_info(self, level: str, key: Any) -> dict[str, float] | None:
         """Return the fitted cell record for ``(level, key)``, or ``None``."""
         cell = self._levels.get(level, {}).get(key)
         if cell is None:
@@ -424,9 +416,7 @@ class EBPriors:
             "default_kappa": self._default_kappa,
             "min_count_for_triple": self._min_count_for_triple,
             "kappa_by_level": dict(self._kappa_by_level),
-            "n_cells_by_level": {
-                lvl: len(cells) for lvl, cells in self._levels.items()
-            },
+            "n_cells_by_level": {lvl: len(cells) for lvl, cells in self._levels.items()},
         }
 
     # ----- Internals ---------------------------------------------------
@@ -484,11 +474,7 @@ class EBPriors:
         parent_key_fn,
         min_count: int,
     ) -> None:
-        filtered = {
-            key: counts
-            for key, counts in cells_counts.items()
-            if counts[1] >= min_count
-        }
+        filtered = {key: counts for key, counts in cells_counts.items() if counts[1] >= min_count}
         kappa = self._estimate_kappa_with_per_cell_parents(
             filtered, parent_level=parent_level, parent_key_fn=parent_key_fn
         )

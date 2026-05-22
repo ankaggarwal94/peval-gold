@@ -42,8 +42,8 @@ already enforces that primitive scan).
 
 from __future__ import annotations
 
-from collections.abc import Iterable
-from typing import Any, Mapping
+from collections.abc import Iterable, Mapping
+from typing import Any
 
 
 def item_only(row: Mapping[str, Any]) -> str:
@@ -104,12 +104,7 @@ def canonical_item(row: Mapping[str, Any]) -> str:
     benchmark = _as_str(row.get("benchmark", ""))
     condition = _as_str(row.get("condition", ""))
     item_content = _as_str(row.get("item_content", ""))
-    return (
-        f"Benchmark: {benchmark}\n"
-        f"Condition: {condition}\n"
-        f"Item:\n"
-        f"{item_content}"
-    )
+    return f"Benchmark: {benchmark}\nCondition: {condition}\nItem:\n{item_content}"
 
 
 def rich_item(row: Mapping[str, Any]) -> str:
@@ -195,10 +190,7 @@ def get_template(name: str):
         lists the accepted names so callers can correct the typo.
     """
     if name not in TEMPLATES:
-        raise ValueError(
-            f"unknown item template {name!r}; "
-            f"accepted names: {sorted(TEMPLATES)}"
-        )
+        raise ValueError(f"unknown item template {name!r}; accepted names: {sorted(TEMPLATES)}")
     return TEMPLATES[name]
 
 

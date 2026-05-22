@@ -14,7 +14,6 @@ artifact interaction.
 from __future__ import annotations
 
 # pylint: disable=import-error
-
 import math
 from pathlib import Path
 from typing import Any

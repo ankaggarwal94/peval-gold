@@ -36,7 +36,6 @@ from peval_gold.data.splits import (
     subject_holdout,
 )
 
-
 # ---------------------------------------------------------------------------
 # Tiny synthetic builders
 # ---------------------------------------------------------------------------
@@ -182,9 +181,7 @@ def test_item_holdout_primary_keeps_all_rows_of_each_held_out_item() -> None:
 
 def test_benchmark_holdout_stress_puts_all_rows_in_val() -> None:
     corpus = _grid_corpus()  # benches: bench0, bench1, bench2.
-    train, val, manifest = benchmark_holdout_stress(
-        corpus, holdout_benchmarks=["bench1"], seed=42
-    )
+    train, val, manifest = benchmark_holdout_stress(corpus, holdout_benchmarks=["bench1"], seed=42)
 
     train_benches = {r["benchmark"] for r in train}
     val_benches = {r["benchmark"] for r in val}
@@ -238,9 +235,7 @@ def test_benchmark_holdout_stress_unknown_benchmark_yields_empty_val() -> None:
 
 
 def test_domain_holdout_groups_by_domain_when_present() -> None:
-    rows = [
-        _row(item_id=f"i-{i}", domain="math") for i in range(5)
-    ] + [
+    rows = [_row(item_id=f"i-{i}", domain="math") for i in range(5)] + [
         _row(item_id=f"i-{i + 100}", domain="medicine") for i in range(5)
     ]
     train, val, manifest = domain_holdout(rows, holdout_domains=["medicine"], seed=42)
@@ -313,9 +308,7 @@ def test_adaptive_label_simulation_reveals_k_per_category() -> None:
         rows.append(_row(benchmark="bench0", item_id=f"b0-i{i}"))
         rows.append(_row(benchmark="bench1", item_id=f"b1-i{i}"))
 
-    labeled, unlabeled, manifest = adaptive_label_simulation(
-        rows, k_per_category=5, seed=42
-    )
+    labeled, unlabeled, manifest = adaptive_label_simulation(rows, k_per_category=5, seed=42)
 
     # Exactly 5 from each category.
     labeled_by_bench = {}
@@ -334,16 +327,10 @@ def test_adaptive_label_simulation_reveals_k_per_category() -> None:
 
 
 def test_adaptive_label_simulation_prefers_category_field_when_present() -> None:
-    rows = [
-        _row(benchmark="bench0", item_id=f"i-{i}", category="sample-A")
-        for i in range(10)
-    ] + [
-        _row(benchmark="bench0", item_id=f"j-{i}", category="sample-B")
-        for i in range(10)
+    rows = [_row(benchmark="bench0", item_id=f"i-{i}", category="sample-A") for i in range(10)] + [
+        _row(benchmark="bench0", item_id=f"j-{i}", category="sample-B") for i in range(10)
     ]
-    labeled, _, manifest = adaptive_label_simulation(
-        rows, k_per_category=3, seed=42
-    )
+    labeled, _, manifest = adaptive_label_simulation(rows, k_per_category=3, seed=42)
     assert manifest["category_key"] == "category"
     labeled_by_cat = {}
     for r in labeled:
@@ -356,9 +343,7 @@ def test_adaptive_label_simulation_handles_small_categories_gracefully() -> None
     """When a category has fewer than ``k_per_category`` rows, take all of them
     without raising."""
     rows = [_row(benchmark="bench0", item_id=f"i-{i}") for i in range(3)]
-    labeled, unlabeled, _ = adaptive_label_simulation(
-        rows, k_per_category=5, seed=42
-    )
+    labeled, unlabeled, _ = adaptive_label_simulation(rows, k_per_category=5, seed=42)
     assert len(labeled) == 3
     assert unlabeled == []
 

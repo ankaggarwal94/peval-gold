@@ -123,9 +123,7 @@ def test_caimira_lite_legacy_state_dict_load_emits_warning_and_zero_inits() -> N
         warnings.simplefilter("always")
         # strict=False because the legacy dict is missing one key.
         fresh.load_state_dict(legacy_state, strict=False)
-    legacy_warnings = [
-        w for w in caught if "diff_mean" in str(w.message)
-    ]
+    legacy_warnings = [w for w in caught if "diff_mean" in str(w.message)]
     assert legacy_warnings, "expected a legacy-load warning mentioning diff_mean"
     # Buffer must be zero-initialized so the model still loads cleanly.
     assert torch.allclose(fresh.diff_mean, torch.zeros(config.latent_dim), atol=0.0)
@@ -174,9 +172,7 @@ def test_caimira_lite_state_dict_roundtrip(tmp_path: Path) -> None:
     torch.save(model.state_dict(), path)
 
     restored = CaimiraLiteModel(config)
-    restored.load_state_dict(
-        torch.load(path, map_location="cpu", weights_only=True)
-    )
+    restored.load_state_dict(torch.load(path, map_location="cpu", weights_only=True))
 
     subject_idx = torch.tensor([0, 1, 2])
     benchmark_idx = torch.tensor([0, 1, 0])
@@ -184,8 +180,6 @@ def test_caimira_lite_state_dict_roundtrip(tmp_path: Path) -> None:
     item_emb = torch.randn(3, 4)
     with torch.no_grad():
         original_logits = model(subject_idx, item_emb, benchmark_idx, condition_idx)
-        restored_logits = restored(
-            subject_idx, item_emb, benchmark_idx, condition_idx
-        )
+        restored_logits = restored(subject_idx, item_emb, benchmark_idx, condition_idx)
 
     assert torch.allclose(original_logits, restored_logits, atol=1e-6)

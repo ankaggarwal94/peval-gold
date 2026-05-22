@@ -40,9 +40,7 @@ REQUIRED_CENTERING_META_KEYS: tuple[str, ...] = (
 
 #: Keys that are allowed to be ``None`` if the source environment did
 #: not provide them (e.g. ``code_git_commit`` is best-effort).
-OPTIONAL_CENTERING_META_KEYS: tuple[str, ...] = (
-    "code_git_commit",
-)
+OPTIONAL_CENTERING_META_KEYS: tuple[str, ...] = ("code_git_commit",)
 
 #: Literal value the ``centering_method`` field MUST take for any
 #: post-D-11 artifact produced by the corrected-centered Modal sprint.

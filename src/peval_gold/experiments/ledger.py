@@ -33,8 +33,9 @@ import json
 import os
 import threading
 import time
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 RUNS_ROOT = REPO_ROOT / "runs" / "gold"
@@ -109,9 +110,7 @@ def write_manifest(
         "config": dict(config),
         "files": list(files),
         "metadata": dict(metadata),
-        "created_utc": _dt.datetime.now(tz=_dt.timezone.utc).strftime(
-            "%Y-%m-%dT%H:%M:%SZ"
-        ),
+        "created_utc": _dt.datetime.now(tz=_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
     manifest_path.write_text(json.dumps(payload, indent=2, default=str))
     return str(manifest_path)

@@ -72,7 +72,8 @@ from __future__ import annotations
 import math
 import random
 from collections import defaultdict
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 import numpy as np
 
@@ -256,9 +257,7 @@ def run_adaptive_simulation(
         )
         labeled_idx = set(labeled_idx_list)
         labeled_rows = [shuffled[i] for i in sorted(labeled_idx)]
-        unlabeled_rows = [
-            shuffled[i] for i in range(len(shuffled)) if i not in labeled_idx
-        ]
+        unlabeled_rows = [shuffled[i] for i in range(len(shuffled)) if i not in labeled_idx]
 
         # Phase 2: build the predictor's `labeled` input + score unlabeled.
         labeled_for_predict = _rows_to_labeled(labeled_rows)

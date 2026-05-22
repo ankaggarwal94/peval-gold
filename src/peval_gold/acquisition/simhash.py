@@ -32,8 +32,6 @@ import os
 from pathlib import Path
 from typing import Any
 
-from peval_gold.acquisition.base import AcquisitionPolicy as _AcquisitionPolicy
-
 
 def _load_labeling_module(labeling_path: Path) -> Any:
     """Load a user-supplied ``labeling.py`` under a private unique name."""
@@ -48,8 +46,7 @@ def _load_labeling_module(labeling_path: Path) -> Any:
     )
     if spec is None or spec.loader is None:  # pragma: no cover - defensive
         raise ImportError(
-            f"could not build spec for {labeling_path}; "
-            "Python import machinery returned None"
+            f"could not build spec for {labeling_path}; Python import machinery returned None"
         )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

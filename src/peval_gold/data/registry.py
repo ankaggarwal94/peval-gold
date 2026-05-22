@@ -45,9 +45,7 @@ def load_subjects(
     """
     from datasets import load_dataset
 
-    ds = load_dataset(
-        repo_id, data_files="subjects.parquet", revision=revision, split="train"
-    )
+    ds = load_dataset(repo_id, data_files="subjects.parquet", revision=revision, split="train")
     return {row["subject_id"]: row for row in ds}
 
 
@@ -58,9 +56,7 @@ def load_items(
     """Load ``items.parquet`` and return a dict keyed by ``item_id``."""
     from datasets import load_dataset
 
-    ds = load_dataset(
-        repo_id, data_files="items.parquet", revision=revision, split="train"
-    )
+    ds = load_dataset(repo_id, data_files="items.parquet", revision=revision, split="train")
     return {row["item_id"]: row for row in ds}
 
 

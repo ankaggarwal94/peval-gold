@@ -31,8 +31,6 @@ needed; every test runs on small synthetic ``(y, p)`` tensors.
 
 from __future__ import annotations
 
-import json
-import math
 import sys
 from pathlib import Path
 
@@ -58,8 +56,7 @@ from peval_gold.calibration.platt import (
     RegularizedPlattCalibrator,
 )
 from peval_gold.calibration.temperature import TemperatureCalibrator
-from peval_gold.eval.metrics import ordinary_log_loss, safe_logit, sigmoid
-
+from peval_gold.eval.metrics import ordinary_log_loss
 
 # ---------------------------------------------------------------------------
 # Synthetic fixtures (cheap; reused across calibrators).
@@ -295,9 +292,7 @@ def test_platt_calibrator_matches_submission_model_py_byte_for_byte() -> None:
     targets_t = torch.tensor(y, dtype=torch.float32)
     a_ref = torch.tensor(1.0, requires_grad=True)
     b_ref = torch.tensor(0.0, requires_grad=True)
-    opt = torch.optim.LBFGS(
-        [a_ref, b_ref], lr=1.0, max_iter=50, line_search_fn="strong_wolfe"
-    )
+    opt = torch.optim.LBFGS([a_ref, b_ref], lr=1.0, max_iter=50, line_search_fn="strong_wolfe")
 
     def closure():
         opt.zero_grad()
@@ -319,12 +314,10 @@ def test_platt_calibrator_matches_submission_model_py_byte_for_byte() -> None:
     cal.fit(y, p)
 
     assert cal.a == pytest.approx(a_expected, abs=1e-5), (
-        f"PlattCalibrator a={cal.a:.6f} drifts from submission "
-        f"reference a={a_expected:.6f}"
+        f"PlattCalibrator a={cal.a:.6f} drifts from submission reference a={a_expected:.6f}"
     )
     assert cal.b == pytest.approx(b_expected, abs=1e-5), (
-        f"PlattCalibrator b={cal.b:.6f} drifts from submission "
-        f"reference b={b_expected:.6f}"
+        f"PlattCalibrator b={cal.b:.6f} drifts from submission reference b={b_expected:.6f}"
     )
 
 
@@ -453,8 +446,7 @@ def test_online_calibrator_picks_a_non_identity_on_well_conditioned_k100() -> No
     )
     online.fit(y, p)
     assert online.last_choice != "IdentityCalibrator", (
-        "well-conditioned K=100 with a real (a, b) shift should beat "
-        "identity after the AIC penalty"
+        "well-conditioned K=100 with a real (a, b) shift should beat identity after the AIC penalty"
     )
 
 
@@ -471,9 +463,7 @@ def test_online_calibrator_transform_matches_chosen_calibrator() -> None:
     chosen_name = online.last_choice
     # Find the chosen calibrator in the list, fit it standalone, and
     # verify that the online dispatcher returns the same predictions.
-    candidate_map = {
-        type(c).__name__: c for c in online.candidates
-    }
+    candidate_map = {type(c).__name__: c for c in online.candidates}
     chosen = candidate_map[chosen_name]
     # The chosen calibrator was fit during online.fit(); refit a fresh
     # instance the same way to verify.
@@ -483,9 +473,7 @@ def test_online_calibrator_transform_matches_chosen_calibrator() -> None:
         ref = IdentityCalibrator()
     ref.fit(y, p)
     test_p = np.array([0.1, 0.5, 0.9])
-    np.testing.assert_allclose(
-        online.transform(test_p), ref.transform(test_p), atol=1e-9
-    )
+    np.testing.assert_allclose(online.transform(test_p), ref.transform(test_p), atol=1e-9)
 
 
 # ---------------------------------------------------------------------------
@@ -510,9 +498,7 @@ def test_per_category_intercept_transform_uses_per_category_when_present() -> No
     """transform_with_categories() must pick the per-category intercept when
     available, falling back to the global intercept otherwise.
     """
-    y = np.concatenate(
-        [np.array([1, 1, 1, 0, 0, 0], dtype=float)] * 5
-    )
+    y = np.concatenate([np.array([1, 1, 1, 0, 0, 0], dtype=float)] * 5)
     p = np.array([0.5] * 30)
     categories = (["A"] * 15) + (["B"] * 15)
     cal = PerCategoryInterceptCalibrator(category_key="benchmark", l2=0.01)
@@ -542,9 +528,7 @@ def test_intercept_calibrator_save_load_round_trip(tmp_path: Path) -> None:
     cal.save(str(pth))
     loaded = InterceptCalibrator.load(str(pth))
     test_p = np.array([0.2, 0.5, 0.8])
-    np.testing.assert_allclose(
-        cal.transform(test_p), loaded.transform(test_p), atol=1e-12
-    )
+    np.testing.assert_allclose(cal.transform(test_p), loaded.transform(test_p), atol=1e-12)
 
 
 def test_temperature_calibrator_save_load_round_trip(tmp_path: Path) -> None:
@@ -555,9 +539,7 @@ def test_temperature_calibrator_save_load_round_trip(tmp_path: Path) -> None:
     cal.save(str(pth))
     loaded = TemperatureCalibrator.load(str(pth))
     test_p = np.array([0.2, 0.5, 0.8])
-    np.testing.assert_allclose(
-        cal.transform(test_p), loaded.transform(test_p), atol=1e-12
-    )
+    np.testing.assert_allclose(cal.transform(test_p), loaded.transform(test_p), atol=1e-12)
 
 
 def test_all_calibrators_return_finite_probabilities_in_unit_interval() -> None:
@@ -576,9 +558,7 @@ def test_all_calibrators_return_finite_probabilities_in_unit_interval() -> None:
         cal.fit(y, p)
         out = cal.transform(test_p)
         assert np.all(np.isfinite(out)), f"{type(cal).__name__} produced non-finite"
-        assert np.all(out >= 1e-4 - 1e-12), (
-            f"{type(cal).__name__} produced p < 1e-4 ({out.min()})"
-        )
+        assert np.all(out >= 1e-4 - 1e-12), f"{type(cal).__name__} produced p < 1e-4 ({out.min()})"
         assert np.all(out <= 1.0 - 1e-4 + 1e-12), (
             f"{type(cal).__name__} produced p > 1-1e-4 ({out.max()})"
         )

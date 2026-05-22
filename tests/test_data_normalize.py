@@ -44,7 +44,6 @@ from peval_gold.data.normalize import (
     parse_subject_name,
 )
 
-
 # ---------------------------------------------------------------------------
 # 1. normalize_row — happy path on a joined row dict
 # ---------------------------------------------------------------------------
@@ -105,9 +104,7 @@ def test_normalize_row_maps_null_test_condition_to_literal_none() -> None:
 
 
 def test_normalize_row_preserves_non_none_condition() -> None:
-    out = normalize_row(
-        {"benchmark": "mmlupro", "condition": "zero-shot", "response": 1.0}
-    )
+    out = normalize_row({"benchmark": "mmlupro", "condition": "zero-shot", "response": 1.0})
     assert out["condition"] == "zero-shot"
 
 

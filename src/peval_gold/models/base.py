@@ -22,7 +22,8 @@ that experimentation in either dimension can proceed without coupling.
 
 from __future__ import annotations
 
-from typing import Protocol, Sequence, runtime_checkable
+from collections.abc import Sequence
+from typing import Protocol, runtime_checkable
 
 import numpy as np
 
@@ -61,7 +62,7 @@ class Predictor(Protocol):
     def save(self, path: str) -> None: ...
 
     @classmethod
-    def load(cls, path: str) -> "Predictor": ...
+    def load(cls, path: str) -> Predictor: ...
 
 
 @runtime_checkable

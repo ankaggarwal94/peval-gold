@@ -118,9 +118,7 @@ class InterceptCalibrator:
         y = np.asarray(y_true, dtype=float)
         p = np.asarray(p_pred_or_logits, dtype=float)
         if y.shape != p.shape:
-            raise ValueError(
-                f"y_true shape {y.shape} != p_pred_or_logits shape {p.shape}"
-            )
+            raise ValueError(f"y_true shape {y.shape} != p_pred_or_logits shape {p.shape}")
         if _identity_fallback_required(y):
             self.b = 0.0
             self.converged = True
@@ -179,7 +177,7 @@ class InterceptCalibrator:
         Path(path).write_text(json.dumps(payload, sort_keys=True))
 
     @classmethod
-    def load(cls, path: str) -> "InterceptCalibrator":
+    def load(cls, path: str) -> InterceptCalibrator:
         payload = json.loads(Path(path).read_text())
         cal = cls(l2=float(payload.get("l2", 0.1)), eps=float(payload.get("eps", _CLIP_EPS)))
         cal.b = float(payload.get("b", 0.0))
@@ -281,8 +279,7 @@ class PerCategoryInterceptCalibrator:
         cats = list(categories)
         if y.shape != p.shape or len(cats) != y.size:
             raise ValueError(
-                f"shape mismatch: y={y.shape}, p={p.shape}, "
-                f"len(categories)={len(cats)}"
+                f"shape mismatch: y={y.shape}, p={p.shape}, len(categories)={len(cats)}"
             )
 
         # Global fit first.
@@ -312,9 +309,7 @@ class PerCategoryInterceptCalibrator:
             if b_cat is not None:
                 self.per_category_intercept[cat] = b_cat
 
-    def _fit_per_cat_intercept(
-        self, z: np.ndarray, y: np.ndarray
-    ) -> float | None:
+    def _fit_per_cat_intercept(self, z: np.ndarray, y: np.ndarray) -> float | None:
         """Fit one per-category intercept with shrinkage to global."""
         b_global = self.global_intercept
         shrinkage = self.shrinkage
@@ -353,9 +348,7 @@ class PerCategoryInterceptCalibrator:
         """Apply the GLOBAL intercept only (Protocol-compatible surface)."""
         p = np.asarray(p_pred_or_logits, dtype=float)
         z = _safe_logit(p, eps=self.eps)
-        return np.clip(
-            _sigmoid(z + self.global_intercept), self.eps, 1.0 - self.eps
-        )
+        return np.clip(_sigmoid(z + self.global_intercept), self.eps, 1.0 - self.eps)
 
     def transform_with_categories(
         self,
@@ -366,9 +359,7 @@ class PerCategoryInterceptCalibrator:
         p = np.asarray(p_pred_or_logits, dtype=float)
         cats = list(categories)
         if len(cats) != p.size:
-            raise ValueError(
-                f"len(categories)={len(cats)} != p.size={p.size}"
-            )
+            raise ValueError(f"len(categories)={len(cats)} != p.size={p.size}")
         z = _safe_logit(p, eps=self.eps)
         b_arr = np.full_like(z, fill_value=self.global_intercept)
         for i, c in enumerate(cats):
@@ -389,7 +380,7 @@ class PerCategoryInterceptCalibrator:
         Path(path).write_text(json.dumps(payload, sort_keys=True))
 
     @classmethod
-    def load(cls, path: str) -> "PerCategoryInterceptCalibrator":
+    def load(cls, path: str) -> PerCategoryInterceptCalibrator:
         payload = json.loads(Path(path).read_text())
         cal = cls(
             category_key=str(payload.get("category_key", "benchmark")),
@@ -399,9 +390,7 @@ class PerCategoryInterceptCalibrator:
             eps=float(payload.get("eps", _CLIP_EPS)),
         )
         cal.global_intercept = float(payload.get("global_intercept", 0.0))
-        cal.per_category_intercept = dict(
-            payload.get("per_category_intercept", {})
-        )
+        cal.per_category_intercept = dict(payload.get("per_category_intercept", {}))
         return cal
 
 

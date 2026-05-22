@@ -11,7 +11,7 @@ in concrete implementations without inheritance.
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
 
 import numpy as np
 import pytest
@@ -19,7 +19,6 @@ import pytest
 from peval_gold.acquisition.base import AcquisitionPolicy
 from peval_gold.calibration.base import Calibrator
 from peval_gold.models.base import Predictor, RuntimePredictor
-
 
 # ---------------------------------------------------------------------------
 # Trivial conforming shims
@@ -46,7 +45,7 @@ class ConstPredictor:
         return None
 
     @classmethod
-    def load(cls, path: str) -> "ConstPredictor":
+    def load(cls, path: str) -> ConstPredictor:
         return cls()
 
 
@@ -73,7 +72,7 @@ class ConstCalibrator:
         return None
 
     @classmethod
-    def load(cls, path: str) -> "ConstCalibrator":
+    def load(cls, path: str) -> ConstCalibrator:
         return cls()
 
 
@@ -139,7 +138,7 @@ def test_class_missing_predict_proba_does_not_satisfy_predictor() -> None:
             return None
 
         @classmethod
-        def load(cls, path: str) -> "BrokenPredictor":
+        def load(cls, path: str) -> BrokenPredictor:
             return cls()
 
     assert not isinstance(BrokenPredictor(), Predictor)
@@ -162,7 +161,7 @@ def test_class_missing_transform_does_not_satisfy_calibrator() -> None:
             return None
 
         @classmethod
-        def load(cls, path: str) -> "BrokenCalibrator":
+        def load(cls, path: str) -> BrokenCalibrator:
             return cls()
 
     assert not isinstance(BrokenCalibrator(), Calibrator)

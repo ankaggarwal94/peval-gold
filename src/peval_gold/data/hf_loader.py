@@ -110,15 +110,11 @@ def load_responses(
     from datasets import load_dataset
 
     parquet = f"{benchmark}.parquet"
-    ds = load_dataset(
-        repo_id, data_files=parquet, revision=revision, split="train"
-    )
+    ds = load_dataset(repo_id, data_files=parquet, revision=revision, split="train")
 
     subjects_by_id = subjects_by_id or load_subjects(revision=revision, repo_id=repo_id)
     items_by_id = items_by_id or load_items(revision=revision, repo_id=repo_id)
-    benchmarks_by_id = benchmarks_by_id or load_benchmarks(
-        revision=revision, repo_id=repo_id
-    )
+    benchmarks_by_id = benchmarks_by_id or load_benchmarks(revision=revision, repo_id=repo_id)
 
     out: list[dict[str, Any]] = []
     for raw in ds:
@@ -189,9 +185,7 @@ def _join_one(
     joined: dict[str, Any] = {
         "benchmark": benchmark.get("benchmark_id") or raw["benchmark_id"],
         "condition": raw.get("test_condition"),
-        "subject_content": _format_subject_content(
-            subject, fallback_id=raw["subject_id"]
-        ),
+        "subject_content": _format_subject_content(subject, fallback_id=raw["subject_id"]),
         "item_content": item.get("content") or "",
         "response": raw.get("response"),
         "subject_id": raw["subject_id"],
@@ -210,9 +204,7 @@ def _join_one(
     return joined
 
 
-def _format_subject_content(
-    subject: dict[str, Any], fallback_id: str
-) -> str:
+def _format_subject_content(subject: dict[str, Any], fallback_id: str) -> str:
     """Mirror ``notebooks/load_data.format_subject_content`` byte-for-byte.
 
     We keep the implementation here (rather than importing from

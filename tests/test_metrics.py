@@ -33,7 +33,6 @@ from peval_gold.eval.metrics import (
     sigmoid,
 )
 
-
 # ---------------------------------------------------------------------------
 # 1. clip_probability
 # ---------------------------------------------------------------------------
@@ -245,7 +244,7 @@ def test_expected_calibration_error_raises_value_error_on_length_mismatch() -> N
 
 
 # ---------------------------------------------------------------------------
-# 8. Sign-convention sanity (matches Codabench display)
+# 8. Sign-convention sanity (matches a hosted-runtime display)
 # ---------------------------------------------------------------------------
 
 
@@ -267,7 +266,7 @@ def test_sign_convention_near_perfect_predictions_drive_mll_close_to_zero() -> N
     assert mll == pytest.approx(-1e-4, abs=1e-6)
     # Sign convention: mll is in the close-to-zero / negative regime,
     # nll is in the close-to-zero / positive regime; higher (less
-    # negative) mll → better, matching the Codabench display.
+    # negative) mll → better, matching the a hosted-runtime display.
     assert mll < 0.0
     assert nll > 0.0
     assert mll == pytest.approx(-nll, abs=1e-12)

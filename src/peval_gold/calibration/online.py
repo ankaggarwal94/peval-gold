@@ -160,9 +160,7 @@ class OnlineCalibrator:
         y = np.asarray(y_true, dtype=float)
         p = np.asarray(p_pred_or_logits, dtype=float)
         if y.shape != p.shape:
-            raise ValueError(
-                f"y_true shape {y.shape} != p_pred_or_logits shape {p.shape}"
-            )
+            raise ValueError(f"y_true shape {y.shape} != p_pred_or_logits shape {p.shape}")
 
         # Hard gate: identity-fallback on tiny / single-class label sets.
         if _identity_fallback_required(y):
@@ -232,7 +230,7 @@ class OnlineCalibrator:
         Path(path).write_text(json.dumps(payload, sort_keys=True))
 
     @classmethod
-    def load(cls, path: str) -> "OnlineCalibrator":
+    def load(cls, path: str) -> OnlineCalibrator:
         payload = json.loads(Path(path).read_text())
         adapter = cls(
             aic_alpha=float(payload.get("aic_alpha", 1.0)),

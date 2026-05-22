@@ -44,7 +44,8 @@ from __future__ import annotations
 import math
 import statistics
 from collections import defaultdict
-from typing import Any, Mapping, Sequence
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 CanonicalRow = Mapping[str, Any]
 CanonicalRows = Sequence[CanonicalRow]
@@ -149,9 +150,7 @@ def binary_filter_summary(rows: CanonicalRows) -> dict[str, dict[str, Any]]:
         rec = by_bench[bench]
         rec["n_input"] += 1
         resp = r.get("response")
-        if isinstance(resp, (int, float)) and not (
-            isinstance(resp, float) and math.isnan(resp)
-        ):
+        if isinstance(resp, (int, float)) and not (isinstance(resp, float) and math.isnan(resp)):
             resp_f = float(resp)
             rec["_unique"].add(resp_f)
             if resp_f in (0.0, 1.0):
@@ -198,9 +197,7 @@ def _per_benchmark_apply(
             r
             for r in group
             if isinstance(r.get("response"), (int, float))
-            and not (
-                isinstance(r["response"], float) and math.isnan(r["response"])
-            )
+            and not (isinstance(r["response"], float) and math.isnan(r["response"]))
         ]
         if not valid:
             continue
@@ -213,9 +210,7 @@ def _per_benchmark_apply(
     return out
 
 
-def _threshold_strict(
-    rows: list[dict[str, Any]], responses: list[float]
-) -> list[dict[str, Any]]:
+def _threshold_strict(rows: list[dict[str, Any]], responses: list[float]) -> list[dict[str, Any]]:
     """Strict ``> median → 1`` threshold; ties → 0."""
     median = statistics.median(responses)
     binarized: list[dict[str, Any]] = []
@@ -226,9 +221,7 @@ def _threshold_strict(
     return binarized
 
 
-def _min_max_normalize(
-    rows: list[dict[str, Any]], responses: list[float]
-) -> list[dict[str, Any]]:
+def _min_max_normalize(rows: list[dict[str, Any]], responses: list[float]) -> list[dict[str, Any]]:
     """Per-benchmark min-max normalize; constant column → zeros."""
     lo = min(responses)
     hi = max(responses)
